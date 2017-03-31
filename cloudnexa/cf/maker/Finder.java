@@ -336,7 +336,14 @@ public class Finder {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String d = df.format(new Date());
         String region = line.get(headers[3]).get(0);
+        String fileName = "";
         String temp = "";
+        for (char c : d.toString().toCharArray()) {
+            if (c == ' ') fileName += '-';
+            else if (c == ':') continue;
+            else fileName += c;
+        }
+        fileName += "-";
         for (char c : region.toCharArray()) {
             if (Character.isLetterOrDigit(c)) {
                 temp += c;
@@ -349,7 +356,6 @@ public class Finder {
             }
         }
         String cloudAccount = line.get(headers[5]).get(0);
-        String fileName = "";
         fileName += parsedComp;
         fileName += "-";
         for (char c : cloudAccount.toString().toCharArray()) {
