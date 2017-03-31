@@ -1,4 +1,4 @@
-package andrew.cf.maker;
+package cloudnexa.cf.maker;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -181,7 +181,7 @@ public class Finder {
                     if (!inList) {
                         fileList.add(fileName);
                     }
-                    andrew.cf.maker.CFmaker.CFBuilder(line,boolarr,fileName,custName,columns);
+                    cloudnexa.cf.maker.CFmaker.CFBuilder(line,boolarr,fileName,custName,columns);
                 }
 
                         //after first line is processed, remaining lines are not the header line
@@ -196,7 +196,7 @@ public class Finder {
 
             //insert the footer into every CF template file that's been created
         for (String s : fileList) {
-            andrew.cf.maker.CFmaker.footerInsert(s);
+            cloudnexa.cf.maker.CFmaker.footerInsert(s);
         }
     }
 
