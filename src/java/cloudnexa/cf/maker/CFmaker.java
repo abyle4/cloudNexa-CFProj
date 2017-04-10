@@ -288,7 +288,7 @@ public class CFmaker {
         out += ",\"Dimensions\": [{\"Name\": \"InstanceId\",\"Value\": \"";
         out += input.get(headers[2]).get(0) + "\"";
 
-        //adding extra dimensions for windows or linux volume utilizatoin alarms
+        //adding extra dimensions for windows or linux volume utilization alarms
         if (casenum == 2){
             if (isWindows){
             out += "},{\"Name\": \"Drive-Letter\",\"Value\": \"C:\"";
