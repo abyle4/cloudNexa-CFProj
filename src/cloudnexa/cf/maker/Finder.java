@@ -1,5 +1,3 @@
-package cloudnexa.cf.maker;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,26 +7,18 @@ import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.text.DateFormat;
 
-/** The Finder class holds the main function and identifies which alarms
- * are missing from each instance
+/** 
+ * The Finder class holds the main function and parses lines from the CSV to send to
+ * the CFmaker.CFBuilder() method
  *
  * @author Andrew Byle
- * @since 2017-03-20
+ * @since 2017-04-08
  */
 public class Finder {
 
-    //setting the defaults to false for all alarms and
     //specifying default separators/quotes
-    //
     private static final char DEFAULT_SEPARATOR = ',';
     private static final char DEFAULT_QUOTE = '"';
-
-    static boolean CPU = false;
-    static boolean STATUS = false;
-    static boolean MEM = false;
-    static boolean PAGE = false;
-    static boolean SWAP = false;
-    static boolean VOL = false;
 
     /**
      * The main function loops through the entire csv file and
@@ -39,13 +29,13 @@ public class Finder {
      */
     public static void main(String[] args) throws Exception {
 
-    //Scanner for command line input (to get account review CSV file path and company name)
+		//Scanner for command line input (to get account review CSV file path and company name)
         Scanner commandInput = new Scanner(System.in);
-        System.out.print("Please enter the full path to the account review CSV file (including the name): ");
+        System.out.print("Please enter the full path to the input CSV file (including the name): ");
         String csvFilePath = commandInput.nextLine();
 
         //create file object using path input by user; if the file does not exist,
-    //ask the user to re-enter the path to file
+		//ask the user to re-enter the path to file
         File csvFile = new File(csvFilePath);
         if (!csvFile.exists()){
                 while (!csvFile.exists()){
@@ -55,11 +45,11 @@ public class Finder {
                 }
         }
 
-        //open account review CSV for reading
+        //open CSV for reading
         Scanner fileReader = new Scanner(csvFile);
 
         //ask for path to output file, to be handed to CFBuilder as part of fileName (see fileNamer() in this class)
-        System.out.print("Please enter the directory in which you'd like the output files to be saved: ");
+		System.out.print("Please enter the directory in which you'd like the output files to be saved: ");
         String pathToOutput = commandInput.nextLine();
 
         //verify that path is valid
@@ -80,95 +70,50 @@ public class Finder {
         String custName = commandInput.nextLine();
 
         //close the command line Scanner
-    commandInput.close();
-
-        //this boolean array keeps track of whether or not an alarm has been created already
-    boolean[] boolarr = new boolean[6];
+		commandInput.close();
 
         //fileList keeps track of the output files being created -- one CF
-    //template will be created per region per cloud account
-    ArrayList<String> fileList = new ArrayList<String>();
+		//template will be created per region per cloud account
+		ArrayList<String> fileList = new ArrayList<String>();
 
         //line holds a parsed line of the account review csv
-    ArrayList<ArrayList<String>> line = new ArrayList<ArrayList<String>>();
+		ArrayList<ArrayList<String>> line = new ArrayList<ArrayList<String>>();
 
         //first line read from the account review CSV is the header line; not to be processed by CFBuilder
         boolean headerLine = true;
 
-    //default values for which column holds data
-    //[alarms,InstName,InstID,region,sysOS,AcctName]
-    int[] columns = {0,1,2,3,4,5};
+		//default values for which column holds data
+		//[alarms,InstName,InstID,region,sysOS,AcctName]
+		int[] columns = {0,1,2,3,4,5,6,7};
 
         //while there are lines to read from the CSV
         while (fileReader.hasNext()) {
 
             //parse the line
-        line = parseLine(fileReader.nextLine());
+			line = parseLine(fileReader.nextLine());
 
-            //reset alarm booleans
-            for (int count = 0; count < 6; count++) boolarr[count] = false;
-
-        //find correct columns if this is the header line
-        if (headerLine && line.size() != 0) {
-            /**
-             *
-             *
-             *
-             *
-             *
-             * THIS NEEDS TO GET WORKED ON
-             *
-             *
-             *
-             */
-            columns = headerReader(line);
-        }
-
-
-
+			//find correct columns if this is the header line
+			if (headerLine && line.size() != 0) {
+				/**
+				*
+				*
+				*
+				*
+				*
+				* THIS NEEDS TO GET WORKED ON
+				*
+				*
+				*
+				*/
+				columns = headerReader(line);
+			}
 
             //if it's not an empty line
-        if (line.size() != 0) {
+			if (line.size() != 0) {
 
-            //first column in the account review CSV contains the list
-            //of created alarms for an instance; check for our standard EC2 alarms
-            for (String str : line.get(columns[0])) {
-                if (str.contains("Status Check Failed")) {
-                    STATUS = true;
-                    boolarr[0] = STATUS;
-                    System.out.println("Found Status Check alarm");
-                }
-                if (str.contains("MemoryUtilization")) {
-                    MEM = true;
-                    boolarr[1] = MEM;
-                    System.out.println("Found MemoryUtilization alarm");
-                }
-                if (str.contains("VolumeUtilization")) {
-                    VOL = true;
-                    boolarr[2] = VOL;
-                    System.out.println("Found VolumeUtilization alarm");
-                }
-                if (str.contains("Paging File Utilization")) {
-                    PAGE = true;
-                    boolarr[3] = PAGE;
-                    System.out.println("Found Paging File Utilization alarm");
-                }
-                if (str.contains("Swap Utilization")) {
-                    SWAP = true;
-                    boolarr[4] = SWAP;
-                    System.out.println("Found Swap Utilization alarm");
-                }
-                if (str.contains("High CPU")) {
-                    CPU = true;
-                    boolarr[5] = CPU;
-                    System.out.println("Found High CPU alarm");
-                }
-
-            }
-
-                    //if this is not the header line, check if a file has been
-            //opened for this cloud account and region and then send to
-            //CFBuilder to add alarms to CF template
+				//if this is not the header line, check if a file has been
+				//opened for this cloud account and region and then send to
+				//CFBuilder to add alarms to CF template
                 if (!headerLine) {
                     String fileName = pathToOutput + fileNamer(line,custName,columns);
                     boolean inList = false;
@@ -184,23 +129,23 @@ public class Finder {
                     cloudnexa.cf.maker.CFmaker.CFBuilder(line,boolarr,fileName,custName,columns);
                 }
 
-                        //after first line is processed, remaining lines are not the header line
+                //after first line is processed, remaining lines are not the header line
                 headerLine = false;
 
             }
             System.out.println("\n");
         }
 
-            //close the input file after all of the lines have been processed
-        fileReader.close();
+        //close the input file after all of the lines have been processed
+		fileReader.close();
 
-            //insert the footer into every CF template file that's been created
-        for (String s : fileList) {
-            cloudnexa.cf.maker.CFmaker.footerInsert(s);
-        }
+        //insert the footer into every CF template file that's been created
+		for (String s : fileList) {
+			cloudnexa.cf.maker.CFmaker.footerInsert(s);
+		}
     }
-
-    public static ArrayList<ArrayList<String>> parseLine(String csvLine) {
+	
+	public static ArrayList<ArrayList<String>> parseLine(String csvLine) {
         return parseLine(csvLine, DEFAULT_SEPARATOR, DEFAULT_QUOTE);
     }
 
@@ -240,7 +185,7 @@ public class Finder {
         boolean inQuotes = false;
         boolean startCollectChar = false;
         boolean doubleQuotesInColumn = false;
-        boolean inList = false;
+		boolean inList = false;
 
         char[] chars = csvLine.toCharArray();
 
@@ -304,7 +249,7 @@ public class Finder {
                 continue;
             }
             else if (ch == '\n') {
-                temp = new ArrayList<String>();
+				temp = new ArrayList<String>();
                 curVal = new StringBuffer();
                 startCollectChar = false;
                 break;
@@ -324,18 +269,18 @@ public class Finder {
 
         return result;
     }
-
-    /**
+	
+	/**
      * The fileNamer method takes in a line from the CSV and the name of the company
      * and outputs the properly named file.
      *
      * @author Andrew Byle
-     * @since 2017-03-22
+     * @since 2017-04-08
      */
-    public static String fileNamer(ArrayList<ArrayList<String>> line,String compName,int headers[]) {
+	public static String fileNamer(ArrayList<ArrayList<String>> line,String compName,int headers[]) {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String d = df.format(new Date());
-        String region = line.get(headers[3]).get(0);
+        String region = line.get(headers[5]).get(0);
         String fileName = "";
         String temp = "";
         for (char c : d.toString().toCharArray()) {
@@ -355,7 +300,7 @@ public class Finder {
             parsedComp += c;
             }
         }
-        String cloudAccount = line.get(headers[5]).get(0);
+        String cloudAccount = line.get(headers[4]).get(0);
         fileName += parsedComp;
         fileName += "-";
         for (char c : cloudAccount.toString().toCharArray()) {
@@ -374,40 +319,44 @@ public class Finder {
         fileName += ".cf";
 
         return fileName;
-        }
-
-    /**
+    }
+	
+	/**
      * The headerReader method takes in a (the first) line from the CSV
      * and outputs a list of integers that tell the program where to
      * look for data.
      *
      * @author Andrew Byle
-     * @since 2017-03-27
+     * @since 2017-04-08
      */
-    public static int[] headerReader(ArrayList<ArrayList<String>> input) {
-        int[] output = new int[6];
+	public static int[] headerReader(ArrayList<ArrayList<String>> input) {
+        int[] output = new int[8];
         int loopCount = 0;
         int spotCount = 0;
         boolean missingHeader = true;
         String compare = "";
 
         //Loop once for each desired column header
-        while (loopCount < 6) {
+        while (loopCount < 8) {
 
             //set the column title
             switch (loopCount) {
                 case 0: compare = "service";
                         break;
-                case 1: compare = "flagged_resource";
+                case 1: compare = "resource ID";
                         break;
-                case 2: compare = "instanceID";
+                case 2: compare = "resource name";
                         break;
-                case 3: compare = "region";
+                case 3: compare = "system OS";
                         break;
-                case 4: compare = "systemOS";
+                case 4: compare = "account name";
                         break;
-                case 5: compare = "cloud_account";
+                case 5: compare = "region";
                         break;
+				case 6: compare = "mounted drives / filesystems";
+						break;
+				case 7: compare = "mount points";
+						break;
                 default: break;
             }
 
@@ -427,8 +376,7 @@ public class Finder {
                 }
                 spotCount ++;
             }
-
-            //If the header cannot be found, the program will return an error.
+			//If the header cannot be found, the program will return an error.
             if (missingHeader) {
                 System.err.println("Column header not found! Please ensure CSV is properly formatted and try again...");
                 System.exit(1);
@@ -442,5 +390,4 @@ public class Finder {
 
         return output;
     }
-
 }
