@@ -1,4 +1,5 @@
-<couldnexa.cf.maker>
+<?xml version="1.0"?>
+    <project name="Automated CloudFormation Project" default="compile">
 
     <target name="clean">
         <delete dir="build"/>
@@ -6,7 +7,7 @@
 
     <target name="compile">
         <mkdir dir="build/classes"/>
-        <javac srcdir="src" destdir="build/classes"/>
+        <javac includeantruntime="false" srcdir="src/cloudnexa/cf/maker" destdir="build/classes"/>
     </target>
 
     <target name="jar">
