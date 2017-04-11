@@ -1,3 +1,5 @@
+package cloudnexa.cf.maker;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,37 +31,37 @@ public class Finder {
      */
     public static void main(String[] args) throws Exception {
 
-		//Scanner for command line input (to get account review CSV file path and company name)
+	//Scanner for command line input (to get account review CSV file path and company name)
         Scanner commandInput = new Scanner(System.in);
         System.out.print("Please enter the full path to the input CSV file (including the name): ");
         String csvFilePath = commandInput.nextLine();
 
         //create file object using path input by user; if the file does not exist,
-		//ask the user to re-enter the path to file
+	//ask the user to re-enter the path to file
         File csvFile = new File(csvFilePath);
         if (!csvFile.exists()){
-                while (!csvFile.exists()){
-                        System.out.print("File could not be found. Please check the name and path to the file and enter again: ");
-                        csvFilePath = commandInput.nextLine();
-                        csvFile = new File(csvFilePath);
-                }
+            while (!csvFile.exists()){
+                System.out.print("File could not be found. Please check the name and path to the file and enter again: ");
+                csvFilePath = commandInput.nextLine();
+                csvFile = new File(csvFilePath);
+            }
         }
 
         //open CSV for reading
         Scanner fileReader = new Scanner(csvFile);
 
         //ask for path to output file, to be handed to CFBuilder as part of fileName (see fileNamer() in this class)
-		System.out.print("Please enter the directory in which you'd like the output files to be saved: ");
+	System.out.print("Please enter the directory in which you'd like the output files to be saved: ");
         String pathToOutput = commandInput.nextLine();
 
         //verify that path is valid
         File outputDirectory = new File(pathToOutput);
         if (!outputDirectory.isDirectory()){
-                while (!outputDirectory.isDirectory()){
-                        System.out.print("Directory not found -- please verify that the directory exists as entered and resubmit: ");
-                        pathToOutput = commandInput.nextLine();
-                        outputDirectory = new File(pathToOutput);
-                }
+            while (!outputDirectory.isDirectory()){
+                System.out.print("Directory not found -- please verify that the directory exists as entered and resubmit: ");
+                pathToOutput = commandInput.nextLine();
+                outputDirectory = new File(pathToOutput);
+            }
         }
 
         //add the trailing slash to the end of the path if it is not there
@@ -70,50 +72,50 @@ public class Finder {
         String custName = commandInput.nextLine();
 
         //close the command line Scanner
-		commandInput.close();
+	commandInput.close();
 
         //fileList keeps track of the output files being created -- one CF
-		//template will be created per region per cloud account
-		ArrayList<String> fileList = new ArrayList<String>();
+	//template will be created per region per cloud account
+	ArrayList<String> fileList = new ArrayList<String>();
 
         //line holds a parsed line of the account review csv
-		ArrayList<ArrayList<String>> line = new ArrayList<ArrayList<String>>();
+	ArrayList<ArrayList<String>> line = new ArrayList<ArrayList<String>>();
 
         //first line read from the account review CSV is the header line; not to be processed by CFBuilder
         boolean headerLine = true;
 
-		//default values for which column holds data
-		//[alarms,InstName,InstID,region,sysOS,AcctName]
-		int[] columns = {0,1,2,3,4,5,6,7};
+	//default values for which column holds data
+	//[alarms,InstName,InstID,region,sysOS,AcctName]
+	int[] columns = {0,1,2,3,4,5,6,7};
 
         //while there are lines to read from the CSV
         while (fileReader.hasNext()) {
 
             //parse the line
-			line = parseLine(fileReader.nextLine());
+	    line = parseLine(fileReader.nextLine());
 
-			//find correct columns if this is the header line
-			if (headerLine && line.size() != 0) {
-				/**
-				*
-				*
-				*
-				*
-				*
-				* THIS NEEDS TO GET WORKED ON
-				*
-				*
-				*
-				*/
-				columns = headerReader(line);
-			}
+	    //find correct columns if this is the header line
+	    if (headerLine && line.size() != 0) {
+	        /**
+	        *
+	        *
+	        *
+	        *
+	        *
+	        * THIS NEEDS TO GET WORKED ON
+	        *
+	        *
+	        *
+	        */
+	        columns = headerReader(line);
+	    }
 
             //if it's not an empty line
-			if (line.size() != 0) {
+	    if (line.size() != 0) {
 
-				//if this is not the header line, check if a file has been
-				//opened for this cloud account and region and then send to
-				//CFBuilder to add alarms to CF template
+	        //if this is not the header line, check if a file has been
+	        //opened for this cloud account and region and then send to
+	        //CFBuilder to add alarms to CF template
                 if (!headerLine) {
                     String fileName = pathToOutput + fileNamer(line,custName,columns);
                     boolean inList = false;
@@ -126,7 +128,7 @@ public class Finder {
                     if (!inList) {
                         fileList.add(fileName);
                     }
-                    cloudnexa.cf.maker.CFmaker.CFBuilder(line,boolarr,fileName,custName,columns);
+                    cloudnexa.cf.maker.CFmaker.CFBuilder(line,fileName,custName,columns);
                 }
 
                 //after first line is processed, remaining lines are not the header line
@@ -137,15 +139,15 @@ public class Finder {
         }
 
         //close the input file after all of the lines have been processed
-		fileReader.close();
+	fileReader.close();
 
         //insert the footer into every CF template file that's been created
-		for (String s : fileList) {
-			cloudnexa.cf.maker.CFmaker.footerInsert(s);
-		}
+	for (String s : fileList) {
+	    cloudnexa.cf.maker.CFmaker.footerInsert(s);
+	}
     }
 	
-	public static ArrayList<ArrayList<String>> parseLine(String csvLine) {
+    public static ArrayList<ArrayList<String>> parseLine(String csvLine) {
         return parseLine(csvLine, DEFAULT_SEPARATOR, DEFAULT_QUOTE);
     }
 
@@ -185,7 +187,7 @@ public class Finder {
         boolean inQuotes = false;
         boolean startCollectChar = false;
         boolean doubleQuotesInColumn = false;
-		boolean inList = false;
+	boolean inList = false;
 
         char[] chars = csvLine.toCharArray();
 
@@ -270,14 +272,14 @@ public class Finder {
         return result;
     }
 	
-	/**
+    /**
      * The fileNamer method takes in a line from the CSV and the name of the company
      * and outputs the properly named file.
      *
      * @author Andrew Byle
      * @since 2017-04-08
      */
-	public static String fileNamer(ArrayList<ArrayList<String>> line,String compName,int headers[]) {
+    public static String fileNamer(ArrayList<ArrayList<String>> line,String compName,int headers[]) {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String d = df.format(new Date());
         String region = line.get(headers[5]).get(0);
@@ -321,7 +323,7 @@ public class Finder {
         return fileName;
     }
 	
-	/**
+    /**
      * The headerReader method takes in a (the first) line from the CSV
      * and outputs a list of integers that tell the program where to
      * look for data.
@@ -329,7 +331,7 @@ public class Finder {
      * @author Andrew Byle
      * @since 2017-04-08
      */
-	public static int[] headerReader(ArrayList<ArrayList<String>> input) {
+    public static int[] headerReader(ArrayList<ArrayList<String>> input) {
         int[] output = new int[8];
         int loopCount = 0;
         int spotCount = 0;
@@ -353,10 +355,10 @@ public class Finder {
                         break;
                 case 5: compare = "region";
                         break;
-				case 6: compare = "mounted drives / filesystems";
-						break;
-				case 7: compare = "mount points";
-						break;
+		case 6: compare = "mounted drives / filesystems";
+			break;
+		case 7: compare = "mount points";
+			break;
                 default: break;
             }
 
