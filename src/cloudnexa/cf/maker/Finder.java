@@ -85,7 +85,7 @@ public class Finder {
         boolean headerLine = true;
 
 	//default values for which column holds data
-	//[alarms,InstName,InstID,region,sysOS,AcctName]
+	//[resource_type,resource_id,name,platform,cloud_account,region,mounted_filesystems,mount_points]
 	int[] columns = {0,1,2,3,4,5,6,7};
 
         //while there are lines to read from the CSV
@@ -343,21 +343,21 @@ public class Finder {
 
             //set the column title
             switch (loopCount) {
-                case 0: compare = "service";
+                case 0: compare = "resource_type";
                         break;
-                case 1: compare = "resource ID";
+                case 1: compare = "resource_id";
                         break;
-                case 2: compare = "resource name";
+                case 2: compare = "name";
                         break;
-                case 3: compare = "system OS";
+                case 3: compare = "platform";
                         break;
-                case 4: compare = "account name";
+                case 4: compare = "cloud_account";
                         break;
                 case 5: compare = "region";
                         break;
-		case 6: compare = "mounted drives / filesystems";
+		case 6: compare = "mounted_filesystems";
 			break;
-		case 7: compare = "mount points";
+		case 7: compare = "mount_points";
 			break;
                 default: break;
             }

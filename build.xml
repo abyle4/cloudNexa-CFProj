@@ -12,7 +12,7 @@
 
     <target name="jar">
         <mkdir dir="build/jar"/>
-        <jar destfile="build/jar/Finder.jar" basedir="build/classes">
+        <jar destfile="build/jar/CF-Creator.jar" basedir="build/classes">
             <manifest>
                 <attribute name="Main-Class" value="cloudnexa.cf.maker.Finder"/>
             </manifest>
@@ -20,7 +20,7 @@
     </target>
 
     <target name="run">
-        <java jar="build/jar/Finder.jar" fork="true"/>
+        <java jar="build/jar/CF-Creator.jar" fork="true"/>
     </target>
 
 </project>

@@ -405,7 +405,7 @@ public class CFmaker {
         out += "\"EvaluationPeriods\" : ";
     	
         switch(casenum){
-            case 0: out += "5";
+            case 0: out += "5"; //generic quantity; number of periods
                     break;
             case 1: out += "2";
                     break;
@@ -435,13 +435,13 @@ public class CFmaker {
         out += "\"Period\" : ";
 		
         switch(casenum){
-            case 0: out += "5";
+            case 0: out += "300"; //seconds
                     break;
-            case 1: out += "1";
+            case 1: out += "60";
                     break;
-            case 2: out += "5";
+            case 2: out += "300";
                     break;
-            case 3: out += "5";
+            case 3: out += "300";
                     break;
             default: return out;
         }
@@ -518,13 +518,13 @@ public class CFmaker {
 	out += "\"MetricName\" : \"";
 		
 	switch(casenum){
-	    case 0: out += "UnhealthyHostCount";
+	    case 0: out += "UnHealthyHostCount";
 	            break;
 	    case 1: out += "HealthyHostCount";
 	            break;
 	    default: return out;
 	}
-	out += "\", \"Namespace\" : \"AWS/ELB\", \"OKActions\" : [{\"Ref\" : \"SNSTopicARN\"}], \"Period\" : 1, \"Statistic\" : \"Average\",";
+	out += "\", \"Namespace\" : \"AWS/ELB\", \"OKActions\" : [{\"Ref\" : \"SNSTopicARN\"}], \"Period\" : 60, \"Statistic\" : \"Average\",";
 	out += "\"Threshold\" : ";
 		
 	switch(casenum){
