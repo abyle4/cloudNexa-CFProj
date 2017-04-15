@@ -1,5 +1,6 @@
 package cloudnexa.cf.maker;
 
+import java.text.NumberFormat;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class CFmaker {
 	String service = input.get(headers[0]).get(0);
 	service = service.toLowerCase();
 		
-	if(service.equals("ec2")){
+	if(service.equals("instance")){
 	    isEC2 = true;
 	}
 	else if(service.equals("rds")){
@@ -42,7 +43,7 @@ public class CFmaker {
 	String sysOS = input.get(headers[3]).get(0);
 	sysOS = sysOS.toLowerCase();
 		
-	if(sysOS.equals("windows")){
+	if(sysOS.contains("windows")){
 	    isWindows = true;
 	}
 		
@@ -198,41 +199,41 @@ public class CFmaker {
      */
     public static double RDSInstanceMemory(String type){
         switch (type){
-            case "m4.large": return 8000000000.0;
+            case "db.m4.large": return 8000000000.0;
 
-            case "m4.xlarge": return 16000000000.0;
+            case "db.m4.xlarge": return 16000000000.0;
             
-            case "m4.2xlarge": return 32000000000.0;
+            case "db.m4.2xlarge": return 32000000000.0;
             
-            case "m4.4xlarge": return 64000000000.0;
+            case "db.m4.4xlarge": return 64000000000.0;
             
-            case "m4.10xlarge": return 160000000000.0;
+            case "db.m4.10xlarge": return 160000000000.0;
             
-            case "m3.medium": return 3750000000.0;
+            case "db.m3.medium": return 3750000000.0;
             
-            case "m3.large": return 7500000000.0;
+            case "db.m3.large": return 7500000000.0;
             
-            case "m3.xlarge": return 15000000000.0;
+            case "db.m3.xlarge": return 15000000000.0;
             
-            case "m3.2xlarge": return 30000000000.0;
+            case "db.m3.2xlarge": return 30000000000.0;
             
-            case "r3.large": return 15000000000.0;
+            case "db.r3.large": return 15000000000.0;
             
-            case "r3.xlarge": return 30500000000.0;
+            case "db.r3.xlarge": return 30500000000.0;
             
-            case "r3.2xlarge": return 61000000000.0;
+            case "db.r3.2xlarge": return 61000000000.0;
             
-            case "r3.4xlarge": return 122000000000.0;
+            case "db.r3.4xlarge": return 122000000000.0;
             
-            case "r3.8xlarge": return 244000000000.0;
+            case "db.r3.8xlarge": return 244000000000.0;
             
-            case "t2.micro": return 1000000000.0;
+            case "db.t2.micro": return 1000000000.0;
             
-            case "t2.small": return 2000000000.0;
+            case "db.t2.small": return 2000000000.0;
             
-            case "t2.medium": return 4000000000.0;
+            case "db.t2.medium": return 4000000000.0;
             
-            case "t2.large": return 8000000000.0;
+            case "db.t2.large": return 8000000000.0;
             
             default: return 0;
         }
@@ -498,12 +499,14 @@ public class CFmaker {
         out += ", \"Statistic\" : \"Average\",";
         out += "\"Threshold\" : ";
         //TO BE UPDATED TO TAKE INSTANCE SIZE INTO CONSIDERATION
+        NumberFormat thresholdFormat = NumberFormat.getInstance();
+        thresholdFormat.setGroupingUsed(false);
         switch(casenum){
             case 0: out += "90.0";
                     break;
-            case 1: out += Double.toString((instanceMemory / 12582880.0) * 0.75);
+            case 1: out += thresholdFormat.format(((instanceMemory / 12582880.0) * 0.75));
                     break;
-            case 2: out += Double.toString(instanceMemory / 4.0); //512,000,000 bytes
+            case 2: out += thresholdFormat.format((instanceMemory / 4.0)); //512,000,000 bytes
                     break;
             case 3: out += "1000000000.0"; //1,000,000,000 bytes
                     break;

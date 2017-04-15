@@ -1,0 +1,6 @@
+,,cloud_account,region,resource_type,resource_id,name,,instance_type,platform,mounted_filesystems,mount_points
+,,AWS_Training (ca-02fd1fcf),us-east-1,Instance,i-036b0787c97a929c7,CFmakerWindowsTest,,t2.micro,Windows (Amazon VPC),[C:],
+,,AWS_Training (ca-02fd1fcf),us-east-1,Instance,i-0b057966c0e27be34,AndrewLambdaTester,,t2.micro,Linux/UNIX (Amazon VPC),[/dev/xvda1],[/]
+,,AWS_Training (ca-02fd1fcf),us-east-1,Instance,i-0eb3ce07a3f8c196d,lvitalos-nginx-test,,t2.micro,Linux/UNIX (Amazon VPC),[/dev/xvda1],[/]
+,,AWS_Training (ca-02fd1fcf),us-east-1,RDS,cndev-69checklist-alarmtest-mysql,cndev-69checklist-alarmtest-mysql,,db.t2.micro,mysql,,
+,,AWS_Training (ca-02fd1fcf),us-east-1,ELB,cndev-elb-69checklist-alarmtest,cndev-elb-69checklist-alarmtest,,,,,

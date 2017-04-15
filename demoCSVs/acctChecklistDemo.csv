@@ -1,6 +1,6 @@
-cloud_account,region,resource_type,resource_id,name,,,platform,mounted_filesystems,mount_points,instance_size
-AWS_Training (ca-02fd1fcf),us-east-1,EC2,i-036b0787c97a929c7,CFmakerWindowsTest,,,Windows,[C:],,
-AWS_Training (ca-02fd1fcf),us-east-1,EC2,i-0eb3ce07a3f8c196d,lvitalos-nginx-test,,,Linux,[/dev/xvda1],[/],
-AWS_Training (ca-02fd1fcf),us-east-1,EC2,i-0b057966c0e27be34,AndrewLambdaTester,,,Linux,[/dev/xvda1],[/],
+cloud_account,region,resource_type,resource_id,name,,,platform,mounted_filesystems,mount_points,instance_type
+AWS_Training (ca-02fd1fcf),us-east-1,instance,i-036b0787c97a929c7,CFmakerWindowsTest,,,Windows (Amazon VPC),[C:],,
+AWS_Training (ca-02fd1fcf),us-east-1,instance,i-0eb3ce07a3f8c196d,lvitalos-nginx-test,,,Linux (Amazon VPC),[/dev/xvda1],[/],
+AWS_Training (ca-02fd1fcf),us-east-1,instance,i-0b057966c0e27be34,AndrewLambdaTester,,,Linux (Amazon VPC),[/dev/xvda1],[/],
 AWS_Training (ca-02fd1fcf),us-east-1,RDS,cndev-69checklist-alarmtest-mysql,cndev-69checklist-alarmtest-mysql,,,mysql,,,t2.micro
 AWS_Training (ca-02fd1fcf),us-east-1,ELB,cndev-elb-69checklist-alarmtest,cndev-elb-69checklist-alarmtest,,,,,,

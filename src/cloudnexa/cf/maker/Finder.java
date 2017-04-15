@@ -359,7 +359,7 @@ public class Finder {
 			break;
 		case 7: compare = "mount_points";
 			break;
-                case 8: compare = "instance_size";
+                case 8: compare = "instance_type";
                 default: break;
             }
 
