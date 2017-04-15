@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
-    <project name="Automated CloudFormation Project" default="compile">
+    <project name="Automated CloudFormation Project" default="jar">
 
     <target name="clean">
         <delete dir="build"/>
     </target>
 
-    <target name="compile">
+    <target name="compile" depends="clean">
         <mkdir dir="build/classes"/>
         <javac includeantruntime="false" srcdir="src/cloudnexa/cf/maker" destdir="build/classes"/>
     </target>
 
-    <target name="jar">
+    <target name="jar" depends="clean,compile">
         <mkdir dir="build/jar"/>
         <jar destfile="build/jar/CF-Creator.jar" basedir="build/classes">
             <manifest>
@@ -19,7 +19,7 @@
         </jar>
     </target>
 
-    <target name="run">
+    <target name="run" depends="clean,compile,jar">
         <java jar="build/jar/CF-Creator.jar" fork="true"/>
     </target>
 
