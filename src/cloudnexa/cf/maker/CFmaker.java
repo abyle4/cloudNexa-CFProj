@@ -537,4 +537,5 @@ public class CFmaker {
 	out += "}}"; //close "Properties", then "Type"; this completes the Resource
 	return out;
     }
+    //temp comment, to remove
 }
