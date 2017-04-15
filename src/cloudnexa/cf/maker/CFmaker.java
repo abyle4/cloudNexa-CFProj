@@ -111,12 +111,12 @@ public class CFmaker {
 	    else if(isRDS){
 		for (int i = 0; i < 4; i++){
 	            if(insertHead){
-		        addme = addme.concat(RDSAlarmMkr(input,i,custName,headers));
+		        addme = addme.concat(RDSAlarmMkr(input,i,custName,headers,RDSInstanceMemory(input.get(headers[8]).get(0))));
 			insertHead = false;
 		    }
 		    else{
 		        addme += ",";
-			addme = addme.concat(RDSAlarmMkr(input,i,custName,headers));
+			addme = addme.concat(RDSAlarmMkr(input,i,custName,headers,RDSInstanceMemory(input.get(headers[8]).get(0))));
 		    }
 		}
 	    }
@@ -186,6 +186,56 @@ public class CFmaker {
             System.out.println(io.toString());
         }
         return;
+    }
+
+    /**
+     * The RDSInstanceMemory method takes in the RDS instance type and returns its memory in bytes.
+     * For use with RDSAlarmMkr, to create Low Memory and High DB Connections alarms that have
+     * thresholds appropriate to the instance type.
+     *
+     * @author Lucas Vitalos
+     * @since 2017-04-15
+     */
+    public static double RDSInstanceMemory(String type){
+        switch (type){
+            case "m4.large": return 8000000000.0;
+
+            case "m4.xlarge": return 16000000000.0;
+            
+            case "m4.2xlarge": return 32000000000.0;
+            
+            case "m4.4xlarge": return 64000000000.0;
+            
+            case "m4.10xlarge": return 160000000000.0;
+            
+            case "m3.medium": return 3750000000.0;
+            
+            case "m3.large": return 7500000000.0;
+            
+            case "m3.xlarge": return 15000000000.0;
+            
+            case "m3.2xlarge": return 30000000000.0;
+            
+            case "r3.large": return 15000000000.0;
+            
+            case "r3.xlarge": return 30500000000.0;
+            
+            case "r3.2xlarge": return 61000000000.0;
+            
+            case "r3.4xlarge": return 122000000000.0;
+            
+            case "r3.8xlarge": return 244000000000.0;
+            
+            case "t2.micro": return 1000000000.0;
+            
+            case "t2.small": return 2000000000.0;
+            
+            case "t2.medium": return 4000000000.0;
+            
+            case "t2.large": return 8000000000.0;
+            
+            default: return 0;
+        }
     }
 	
     /**
@@ -344,7 +394,7 @@ public class CFmaker {
      * @author Lucas Vitalos
      * @since 2017-04-08
      */
-    public static String RDSAlarmMkr(ArrayList<ArrayList<String>> input, int casenum, String custName, int headers[]){
+    public static String RDSAlarmMkr(ArrayList<ArrayList<String>> input, int casenum, String custName, int headers[], double instanceMemory){
         String out = "";
     	
         //resource ID to be stripped of any non-alphanumeric characters
@@ -451,9 +501,9 @@ public class CFmaker {
         switch(casenum){
             case 0: out += "90.0";
                     break;
-            case 1: out += "200.0";
+            case 1: out += Double.toString((instanceMemory / 12582880.0) * 0.75);
                     break;
-            case 2: out += "512000000.0"; //512,000,000 bytes
+            case 2: out += Double.toString(instanceMemory / 4.0); //512,000,000 bytes
                     break;
             case 3: out += "1000000000.0"; //1,000,000,000 bytes
                     break;
@@ -537,5 +587,4 @@ public class CFmaker {
 	out += "}}"; //close "Properties", then "Type"; this completes the Resource
 	return out;
     }
-    //temp comment, to remove
 }

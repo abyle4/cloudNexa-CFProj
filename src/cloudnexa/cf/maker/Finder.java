@@ -33,7 +33,7 @@ public class Finder {
 
 	//Scanner for command line input (to get account review CSV file path and company name)
         Scanner commandInput = new Scanner(System.in);
-        System.out.print("Please enter the full path to the input CSV file (including the name): ");
+        System.out.println("Please enter the full path to the input CSV file (including the name): ");
         String csvFilePath = commandInput.nextLine();
 
         //create file object using path input by user; if the file does not exist,
@@ -41,7 +41,7 @@ public class Finder {
         File csvFile = new File(csvFilePath);
         if (!csvFile.exists()){
             while (!csvFile.exists()){
-                System.out.print("File could not be found. Please check the name and path to the file and enter again: ");
+                System.out.println("File could not be found. Please check the name and path to the file and enter again: ");
                 csvFilePath = commandInput.nextLine();
                 csvFile = new File(csvFilePath);
             }
@@ -51,14 +51,14 @@ public class Finder {
         Scanner fileReader = new Scanner(csvFile);
 
         //ask for path to output file, to be handed to CFBuilder as part of fileName (see fileNamer() in this class)
-	System.out.print("Please enter the directory in which you'd like the output files to be saved: ");
+	System.out.println("Please enter the directory in which you'd like the output files to be saved: ");
         String pathToOutput = commandInput.nextLine();
 
         //verify that path is valid
         File outputDirectory = new File(pathToOutput);
         if (!outputDirectory.isDirectory()){
             while (!outputDirectory.isDirectory()){
-                System.out.print("Directory not found -- please verify that the directory exists as entered and resubmit: ");
+                System.out.println("Directory not found -- please verify that the directory exists as entered and resubmit: ");
                 pathToOutput = commandInput.nextLine();
                 outputDirectory = new File(pathToOutput);
             }
@@ -68,7 +68,7 @@ public class Finder {
         if (!pathToOutput.endsWith("/")) pathToOutput = pathToOutput.concat("/");
 
         //get customer name for alarm names as well as output file name
-        System.out.print("Please enter the customer name: ");
+        System.out.println("Please enter the customer name: ");
         String custName = commandInput.nextLine();
 
         //close the command line Scanner
@@ -332,14 +332,14 @@ public class Finder {
      * @since 2017-04-08
      */
     public static int[] headerReader(ArrayList<ArrayList<String>> input) {
-        int[] output = new int[8];
+        int[] output = new int[9];
         int loopCount = 0;
         int spotCount = 0;
         boolean missingHeader = true;
         String compare = "";
 
         //Loop once for each desired column header
-        while (loopCount < 8) {
+        while (loopCount < 9) {
 
             //set the column title
             switch (loopCount) {
@@ -359,6 +359,7 @@ public class Finder {
 			break;
 		case 7: compare = "mount_points";
 			break;
+                case 8: compare = "instance_size";
                 default: break;
             }
 
