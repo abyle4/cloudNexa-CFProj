@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
     <project name="Automated CloudFormation Project" default="jar">
 
+    <target name="cleans3">
+        <delete dir="outputs"/>
+    </target>
+        
     <target name="clean">
         <delete dir="build"/>
     </target>
@@ -20,6 +24,7 @@
     </target>
 
     <target name="run" depends="clean,compile,jar">
+        <mkdir dir="outputs"/>
         <java jar="build/jar/CF-Creator.jar" fork="true"/>
     </target>
 
