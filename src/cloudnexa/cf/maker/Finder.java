@@ -1,6 +1,7 @@
 package cloudnexa.cf.maker;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -8,6 +9,12 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.text.DateFormat;
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 
 /** 
  * The Finder class holds the main function and parses lines from the CSV to send to
@@ -31,13 +38,13 @@ public class Finder {
      */
     public static void main(String[] args) throws Exception {
 
-	//Scanner for command line input (to get account review CSV file path and company name)
+        //Scanner for command line input (to get account review CSV file path and company name)
         Scanner commandInput = new Scanner(System.in);
         System.out.println("Please enter the full path to the input CSV file (including the name): ");
         String csvFilePath = commandInput.nextLine();
 
         //create file object using path input by user; if the file does not exist,
-	//ask the user to re-enter the path to file
+        //ask the user to re-enter the path to file
         File csvFile = new File(csvFilePath);
         if (!csvFile.exists()){
             while (!csvFile.exists()){
@@ -50,8 +57,9 @@ public class Finder {
         //open CSV for reading
         Scanner fileReader = new Scanner(csvFile);
 
-        //ask for path to output file, to be handed to CFBuilder as part of fileName (see fileNamer() in this class)
-	System.out.println("Please enter the directory in which you'd like the output files to be saved: ");
+        /*
+         * ///ask for path to output file, to be handed to CFBuilder as part of fileName (see fileNamer() in this class)
+        System.out.println("Please enter the directory in which you'd like the output files to be saved: ");
         String pathToOutput = commandInput.nextLine();
 
         //verify that path is valid
@@ -66,56 +74,48 @@ public class Finder {
 
         //add the trailing slash to the end of the path if it is not there
         if (!pathToOutput.endsWith("/")) pathToOutput = pathToOutput.concat("/");
+        */
+
+        String pathToOutput = "/home/ec2-user/cloudNexa-CFProj/outputs/";
 
         //get customer name for alarm names as well as output file name
         System.out.println("Please enter the customer name: ");
         String custName = commandInput.nextLine();
 
         //close the command line Scanner
-	commandInput.close();
+        commandInput.close();
 
         //fileList keeps track of the output files being created -- one CF
-	//template will be created per region per cloud account
-	ArrayList<String> fileList = new ArrayList<String>();
+        //template will be created per region per cloud account
+        ArrayList<String> fileList = new ArrayList<String>();
 
         //line holds a parsed line of the account review csv
-	ArrayList<ArrayList<String>> line = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<String>> line = new ArrayList<ArrayList<String>>();
 
         //first line read from the account review CSV is the header line; not to be processed by CFBuilder
         boolean headerLine = true;
 
-	//default values for which column holds data
-	//[resource_type,resource_id,name,platform,cloud_account,region,mounted_filesystems,mount_points]
-	int[] columns = {0,1,2,3,4,5,6,7};
+        //default values for which column holds data
+        //[resource_type,resource_id,name,platform,cloud_account,region,mounted_filesystems,mount_points]
+        int[] columns = {0,1,2,3,4,5,6,7};
 
         //while there are lines to read from the CSV
         while (fileReader.hasNext()) {
 
             //parse the line
-	    line = parseLine(fileReader.nextLine());
+            line = parseLine(fileReader.nextLine());
 
-	    //find correct columns if this is the header line
-	    if (headerLine && line.size() != 0) {
-	        /**
-	        *
-	        *
-	        *
-	        *
-	        *
-	        * THIS NEEDS TO GET WORKED ON
-	        *
-	        *
-	        *
-	        */
-	        columns = headerReader(line);
-	    }
+            //find correct columns if this is the header line
+            if (headerLine && line.size() != 0) {
+                columns = headerReader(line);
+            }
 
             //if it's not an empty line
-	    if (line.size() != 0) {
+            if (line.size() != 0) {
 
-	        //if this is not the header line, check if a file has been
-	        //opened for this cloud account and region and then send to
-	        //CFBuilder to add alarms to CF template
+                //if this is not the header line, check if a file has been
+                //opened for this cloud account and region and then send to
+                //CFBuilder to add alarms to CF template
                 if (!headerLine) {
                     String fileName = pathToOutput + fileNamer(line,custName,columns);
                     boolean inList = false;
@@ -130,21 +130,19 @@ public class Finder {
                     }
                     cloudnexa.cf.maker.CFmaker.CFBuilder(line,fileName,custName,columns);
                 }
-
                 //after first line is processed, remaining lines are not the header line
                 headerLine = false;
-
             }
             System.out.println("\n");
         }
 
         //close the input file after all of the lines have been processed
-	fileReader.close();
+        fileReader.close();
 
         //insert the footer into every CF template file that's been created
-	for (String s : fileList) {
-	    cloudnexa.cf.maker.CFmaker.footerInsert(s);
-	}
+        for (String s : fileList) {
+            cloudnexa.cf.maker.CFmaker.footerInsert(s);
+        }
     }
 	
     public static ArrayList<ArrayList<String>> parseLine(String csvLine) {
@@ -187,7 +185,7 @@ public class Finder {
         boolean inQuotes = false;
         boolean startCollectChar = false;
         boolean doubleQuotesInColumn = false;
-	boolean inList = false;
+        boolean inList = false;
 
         char[] chars = csvLine.toCharArray();
 
@@ -355,10 +353,10 @@ public class Finder {
                         break;
                 case 5: compare = "region";
                         break;
-		case 6: compare = "mounted_filesystems";
-			break;
-		case 7: compare = "mount_points";
-			break;
+        		case 6: compare = "mounted_filesystems";
+		            	break;
+                case 7: compare = "mount_points";
+                        break;
                 case 8: compare = "instance_type";
                 default: break;
             }
@@ -393,4 +391,39 @@ public class Finder {
 
         return output;
     }
+
+    public static void s3Uploader(ArrayList<String> fileList) {
+        private static String bucketName = "cnexa-cf-scripts";
+        private static String keyName = //KEYNAME HERE;
+        String uploadFileName = "";
+        int count = 0;
+
+        AmazonS3 s3client = new AmazonS3Client(new ProfileCredentialsProvider());
+        try {
+            System.out.println("Beginning S3 file upload...\n");
+            for (String s : fileList) {
+                uploadFileName = s;
+                File file = new File(uploadFileName);
+                s3client.putObject(new PutObjectRequest(buckeName,keyName,file));
+            }
+        }
+        catch (AmazonServiceException ase) {
+            System.out.println("Caught an AmazonServiceException, which " +
+            		"means your request made it " +
+                    "to Amazon S3, but was rejected with an error response" +
+                    " for some reason.");
+            System.out.println("Error Message:    " + ase.getMessage());
+            System.out.println("HTTP Status Code: " + ase.getStatusCode());
+            System.out.println("AWS Error Code:   " + ase.getErrorCode());
+            System.out.println("Error Type:       " + ase.getErrorType());
+            System.out.println("Request ID:       " + ase.getRequestId());
+        }
+		catch (AmazonClientException ace) {
+            System.out.println("Caught an AmazonClientException, which " +
+            		"means the client encountered " +
+                    "an internal error while trying to " +
+                    "communicate with S3, " +
+                    "such as not being able to access the network.");
+            System.out.println("Error Message: " + ace.getMessage());
+        }
 }

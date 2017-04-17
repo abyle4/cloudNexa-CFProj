@@ -20,133 +20,132 @@ public class CFmaker {
      */
     public static void CFBuilder(ArrayList<ArrayList<String>> input, String fileName, String custName, int headers[]){
     	boolean isEC2 = false;
-	boolean isRDS = false;
-	boolean isELB = false;
-	String service = input.get(headers[0]).get(0);
-	service = service.toLowerCase();
-		
-	if(service.equals("instance")){
-	    isEC2 = true;
-	}
-	else if(service.equals("rds")){
-	    isRDS = true;
-	}
-	else if(service.equals("elb")){
-	    isELB = true;
-	}
-	else{
-	    return;
-	}
-		
-	//default assumption is Linux for system OS
-	boolean isWindows = false;
-	String sysOS = input.get(headers[3]).get(0);
-	sysOS = sysOS.toLowerCase();
-		
-	if(sysOS.contains("windows")){
-	    isWindows = true;
-	}
-		
-	try {
-	    BufferedWriter bw = null;
-	    FileWriter  fw = null;
-			
-	    //open the header file to read and copy to the beginning of new CF templates
-	    Scanner scanner = new Scanner (new File("/home/ec2-user/andrew/cf/maker/header"));
-			
-	    //Ensures that the header at the top of the output file is only inserted once
-	    //	(at the time of file creation)
-	    //
-	    boolean insertHead = false;
-	    ArrayList<String> temp = new ArrayList<String>();
-			
-	    //output file
-	    File myfile = new File(fileName);
-			
-	    //if the specified output file doesn't exist, create a new one and mark it for header insertion
-	    if(!myfile.exists()){
-	    insertHead = true;
-	    myfile.createNewFile();
-	    }
-			
-	    fw = new FileWriter(myfile.getAbsoluteFile(),true);
-	    bw = new BufferedWriter(fw);
-			
-	    if (insertHead){
-	    	while (scanner.hasNext()){
-	            temp.add(scanner.next());
-		}
-				
-		for (String str : temp){
-	            bw.write(str);
-		}
-	    }
-			
-	    String addme = "";
-	    if(isEC2){
-		for (int i = 0; i < 6; i++){
-	            //i == 4 is SwapUtilization; skip if Windows
-		    if(i == 4 && isWindows){
-			continue;
-		    }
-		    //i == 3 is PagingFileUtilization; skip if Linux
-		    else if (i == 3 && !isWindows){
-			continue;
-		    }
-					
-		    //If the file has not been previously created, no comma is needed
-		    //because this alarm is the first
-		    //
-		    if(insertHead){
-			addme = addme.concat(EC2AlarmMkr(input,i,isWindows,custName,headers));
-			insertHead = false;
-		    }
-		    //Otherwise, there is at least one preceding alarm in the file, so a comma is inserted
-		    //
-		    else{
-			addme += ",";
-			addme = addme.concat(EC2AlarmMkr(input,i,isWindows,custName,headers));
-		    }
-		}
-	    }
-	    else if(isRDS){
-		for (int i = 0; i < 4; i++){
-	            if(insertHead){
-		        addme = addme.concat(RDSAlarmMkr(input,i,custName,headers,RDSInstanceMemory(input.get(headers[8]).get(0))));
-			insertHead = false;
-		    }
-		    else{
-		        addme += ",";
-			addme = addme.concat(RDSAlarmMkr(input,i,custName,headers,RDSInstanceMemory(input.get(headers[8]).get(0))));
-		    }
-		}
-	    }
-	    else{
-	        //is ELB
-		for (int i = 0; i < 2; i++){
-		    if(insertHead){
-		        addme = addme.concat(ELBAlarmMkr(input,i,custName,headers));
-			insertHead = false;
-		    }
-		    else{
-			addme += ",";
-			addme = addme.concat(ELBAlarmMkr(input,i,custName,headers));
-		    }
-		}
-	    }
-			
-	    //write CF template to buffer, flush buffer to FileWriter and FileWriter to file
-	    //then close buffer and filewriter
-	    bw.write(addme);
-			
-	    bw.flush();
-	    fw.flush();
-	    bw.close();
-	    fw.close();
-	}
-	catch (IOException io){
-	    System.out.println(io.toString());
-	}
+        boolean isRDS = false;
+        boolean isELB = false;
+        String service = input.get(headers[0]).get(0);
+        service = service.toLowerCase();
+            
+        if(service.equals("instance")){
+            isEC2 = true;
+        }
+        else if(service.equals("rds")){
+            isRDS = true;
+        }
+        else if(service.equals("elb")){
+            isELB = true;
+        }
+        else{
+            return;
+        }
+            
+        //default assumption is Linux for system OS
+        boolean isWindows = false;
+        String sysOS = input.get(headers[3]).get(0);
+        sysOS = sysOS.toLowerCase();
+            
+        if(sysOS.contains("windows")){
+            isWindows = true;
+        }
+            
+        try {
+            BufferedWriter bw = null;
+            FileWriter  fw = null;
+                
+            //open the header file to read and copy to the beginning of new CF templates
+            Scanner scanner = new Scanner (new File("/home/ec2-user/andrew/cf/maker/header"));
+                
+            //Ensures that the header at the top of the output file is only inserted once
+            //	(at the time of file creation)
+            //
+            boolean insertHead = false;
+            ArrayList<String> temp = new ArrayList<String>();
+                
+            //output file
+            File myfile = new File(fileName);
+                
+            //if the specified output file doesn't exist, create a new one and mark it for header insertion
+            if(!myfile.exists()){
+                insertHead = true;
+                myfile.createNewFile();
+            }
+                
+            fw = new FileWriter(myfile.getAbsoluteFile(),true);
+            bw = new BufferedWriter(fw);
+                
+            if (insertHead){
+                while (scanner.hasNext()){
+                    temp.add(scanner.next());
+                }
+                for (String str : temp){
+                    bw.write(str);
+                }
+            }
+                
+            String addme = "";
+            if(isEC2){
+                for (int i = 0; i < 6; i++){
+                    //i == 4 is SwapUtilization; skip if Windows
+                    if(i == 4 && isWindows){
+                        continue;
+                    }
+                    //i == 3 is PagingFileUtilization; skip if Linux
+                    else if (i == 3 && !isWindows){
+                        continue;
+                    }
+                            
+                    //If the file has not been previously created, no comma is needed
+                    //because this alarm is the first
+                    //
+                    if(insertHead){
+                        addme = addme.concat(EC2AlarmMkr(input,i,isWindows,custName,headers));
+                        insertHead = false;
+                    }
+                    //Otherwise, there is at least one preceding alarm in the file, so a comma is inserted
+                    //
+                    else{
+                        addme += ",";
+                        addme = addme.concat(EC2AlarmMkr(input,i,isWindows,custName,headers));
+                    }
+                }
+            }
+            else if(isRDS){
+                for (int i = 0; i < 4; i++){
+                    if(insertHead){
+                        addme = addme.concat(RDSAlarmMkr(input,i,custName,headers,RDSInstanceMemory(input.get(headers[8]).get(0))));
+                        insertHead = false;
+                    }
+                    else{
+                        addme += ",";
+                        addme = addme.concat(RDSAlarmMkr(input,i,custName,headers,RDSInstanceMemory(input.get(headers[8]).get(0))));
+                    }
+                }
+            }
+            else{
+                //is ELB
+                for (int i = 0; i < 2; i++){
+                    if(insertHead){
+                        addme = addme.concat(ELBAlarmMkr(input,i,custName,headers));
+                        insertHead = false;
+                    }
+                    else{
+                        addme += ",";
+                        addme = addme.concat(ELBAlarmMkr(input,i,custName,headers));
+                    }
+                }
+            }
+                
+            //write CF template to buffer, flush buffer to FileWriter and FileWriter to file
+            //then close buffer and filewriter
+            bw.write(addme);
+                
+            bw.flush();
+            fw.flush();
+            bw.close();
+            fw.close();
+        }
+        catch (IOException io){
+            System.out.println(io.toString());
+        }
     }
 	
     /**
@@ -259,7 +258,7 @@ public class CFmaker {
 	    else instanceID += c;
 	}
 		
-		//input.get(headers[2]).get(0) is the instance name
+    //input.get(headers[2]).get(0) is the instance name
 	switch (casenum){
 	    case 0: out += "\"" + instanceID + "EC2HealthStatusCheckAlarm\"";
                     System.out.println("Adding Status Check alarm for " + input.get(headers[2]).get(0));
@@ -368,21 +367,20 @@ public class CFmaker {
         //adding extra dimensions for windows or linux volume utilization alarms
         if (casenum == 2){
             if (isWindows){
-		//input.get(headers[6]) is the list of drive letters in use for windows instances
-		for (String d : input.get(headers[6])){
-		    out += "},{\"Name\": \"Drive-Letter\",\"Value\": \"" + d + "\"";
-		}
-				
+                //input.get(headers[6]) is the list of drive letters in use for windows instances
+                for (String d : input.get(headers[6])){
+                out += "},{\"Name\": \"Drive-Letter\",\"Value\": \"" + d + "\"";
+                }
             }
             else{
-		//input.get(headers[6]) is the list of mounted filesystems for linux instances
-		//input.get(headers[7]) is the corresponding list of mount points
-	    	for (int i = 0; i < input.get(headers[6]).size(); i++){
-	            out += "},{\"Name\": \"MountPath\",\"Value\": \"" + input.get(headers[7]).get(i) + "\"},{\"Name\": \"Filesystem\",\"Value\": \"" + input.get(headers[6]).get(i) + "\"";
-		}
+                //input.get(headers[6]) is the list of mounted filesystems for linux instances
+                //input.get(headers[7]) is the corresponding list of mount points
+                for (int i = 0; i < input.get(headers[6]).size(); i++){
+                    out += "},{\"Name\": \"MountPath\",\"Value\": \"" + input.get(headers[7]).get(i) + "\"},{\"Name\": \"Filesystem\",\"Value\": \"" + input.get(headers[6]).get(i) + "\"";
+                }
             }
         }
-	//last two brackets close Properties and then Type, completing the Resource
+        //last two brackets close Properties and then Type, completing the Resource
         out += "}],\"ComparisonOperator\": \"GreaterThanThreshold\"}}";
 
         return out;
@@ -404,7 +402,7 @@ public class CFmaker {
         for (char c : input.get(headers[1]).get(0).toCharArray()){
             if (!Character.isLetterOrDigit(c)) continue;
             else resourceID += c;
-	}
+        }
 		
         //input.get(headers[2]).get(0) is the resource name
         switch(casenum){
@@ -526,68 +524,68 @@ public class CFmaker {
     public static String ELBAlarmMkr(ArrayList<ArrayList<String>> input, int casenum, String custName, int headers[]){
     	String out = "";
 		
-	//resource ID to be stripped of any non-alphanumeric characters
-	//and inserted in front of the Resource key to make it unique
-	String resourceID = "";
-	for (char c : input.get(headers[1]).get(0).toCharArray()){
-            if (!Character.isLetterOrDigit(c)) continue;
-	    else resourceID += c;
-	}
-		
-	//input.get(headers[2]).get(0) is the resource name
-	switch(casenum){
-	    case 0: out += "\"" + resourceID + "ELBHighUnhealthyHostsAlarm\"";
-	            System.out.println("Adding High Unhealthy Hosts alarm for " + input.get(headers[2]).get(0));
-		    break;
-	    case 1: out += "\"" + resourceID + "ELBNoHealthyHostsAlarm\"";
-	            System.out.println("Adding No Healthy Hosts alarm for " + input.get(headers[2]).get(0));
-		    break;
-	    default: return out;
-	}
-	out += " : { \"Type\" : \"AWS::CloudWatch::Alarm\", \"DeletionPolicy\" : \"Retain\", \"Properties\" : {";
-	out += "\"ActionsEnabled\" : true, \"AlarmActions\" : [{\"Ref\" : \"SNSTopicARN\"}],";
-	out += "\"AlarmName\" : \"" + custName + " - ELB: ";
-		
-	switch(casenum){
-	    case 0: out += "High Unhealthy Hosts";
-	            break;
-	    case 1: out += "No Healthy Hosts";
-	            break;
-	    default: return out;
-	}
-	out += " - " + input.get(headers[2]).get(0) + "\",";
-	out += "\"ComparisonOperator\" : \"";
-		
-	switch(casenum){
-	    case 0: out += "GreaterThanOrEqualToThreshold";
-	            break;
-	    case 1: out += "LessThanThreshold";
-	            break;
-	    default: return out;
-	}
-	//input.get(headers[1]).get(0) is the resource ID
-	out += "\", \"Dimensions\" : [{\"Name\" : \"LoadBalancerName\", \"Value\" : \"" + input.get(headers[1]).get(0) + "\"}],";
-	out += "\"EvaluationPeriods\" : 5,";
-	out += "\"MetricName\" : \"";
-		
-	switch(casenum){
-	    case 0: out += "UnHealthyHostCount";
-	            break;
-	    case 1: out += "HealthyHostCount";
-	            break;
-	    default: return out;
-	}
-	out += "\", \"Namespace\" : \"AWS/ELB\", \"OKActions\" : [{\"Ref\" : \"SNSTopicARN\"}], \"Period\" : 60, \"Statistic\" : \"Average\",";
-	out += "\"Threshold\" : ";
-		
-	switch(casenum){
-	    case 0: out += "1.0";
-	            break;
-	    case 1: out += "1.0";
-	            break;
-	    default: return out;
-	}
-	out += "}}"; //close "Properties", then "Type"; this completes the Resource
-	return out;
+        //resource ID to be stripped of any non-alphanumeric characters
+        //and inserted in front of the Resource key to make it unique
+        String resourceID = "";
+        for (char c : input.get(headers[1]).get(0).toCharArray()){
+                if (!Character.isLetterOrDigit(c)) continue;
+            else resourceID += c;
+        }
+            
+        //input.get(headers[2]).get(0) is the resource name
+        switch(casenum){
+            case 0: out += "\"" + resourceID + "ELBHighUnhealthyHostsAlarm\"";
+                    System.out.println("Adding High Unhealthy Hosts alarm for " + input.get(headers[2]).get(0));
+                break;
+            case 1: out += "\"" + resourceID + "ELBNoHealthyHostsAlarm\"";
+                    System.out.println("Adding No Healthy Hosts alarm for " + input.get(headers[2]).get(0));
+                break;
+            default: return out;
+        }
+        out += " : { \"Type\" : \"AWS::CloudWatch::Alarm\", \"DeletionPolicy\" : \"Retain\", \"Properties\" : {";
+        out += "\"ActionsEnabled\" : true, \"AlarmActions\" : [{\"Ref\" : \"SNSTopicARN\"}],";
+        out += "\"AlarmName\" : \"" + custName + " - ELB: ";
+            
+        switch(casenum){
+            case 0: out += "High Unhealthy Hosts";
+                    break;
+            case 1: out += "No Healthy Hosts";
+                    break;
+            default: return out;
+        }
+        out += " - " + input.get(headers[2]).get(0) + "\",";
+        out += "\"ComparisonOperator\" : \"";
+            
+        switch(casenum){
+            case 0: out += "GreaterThanOrEqualToThreshold";
+                    break;
+            case 1: out += "LessThanThreshold";
+                    break;
+            default: return out;
+        }
+        //input.get(headers[1]).get(0) is the resource ID
+        out += "\", \"Dimensions\" : [{\"Name\" : \"LoadBalancerName\", \"Value\" : \"" + input.get(headers[1]).get(0) + "\"}],";
+        out += "\"EvaluationPeriods\" : 5,";
+        out += "\"MetricName\" : \"";
+            
+        switch(casenum){
+            case 0: out += "UnHealthyHostCount";
+                    break;
+            case 1: out += "HealthyHostCount";
+                    break;
+            default: return out;
+        }
+        out += "\", \"Namespace\" : \"AWS/ELB\", \"OKActions\" : [{\"Ref\" : \"SNSTopicARN\"}], \"Period\" : 60, \"Statistic\" : \"Average\",";
+        out += "\"Threshold\" : ";
+            
+        switch(casenum){
+            case 0: out += "1.0";
+                    break;
+            case 1: out += "1.0";
+                    break;
+            default: return out;
+        }
+        out += "}}"; //close "Properties", then "Type"; this completes the Resource
+        return out;
     }
 }
