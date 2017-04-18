@@ -8,10 +8,15 @@
     <target name="clean">
         <delete dir="build"/>
     </target>
-
+    
+    <path id="aws.java.sdk.classpath">
+        <fileset dir="src/aws-java-sdk-1.11.119/third-party" includes="**/*.jar"/>
+        <fileset dir="src/aws-java-sdk-1.11.119/lib" includes="**/*.jar"/>
+        <pathelement location="."/>
+    </path>
     <target name="compile" depends="clean">
         <mkdir dir="build/classes"/>
-        <javac includeantruntime="false" srcdir="src/cloudnexa/cf/maker" destdir="build/classes"/>
+        <javac classpathref="aws.java.sdk.classpath" includeantruntime="false" srcdir="src/cloudnexa/cf/maker" destdir="build/classes"/>
     </target>
 
     <target name="jar" depends="clean,compile">
