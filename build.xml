@@ -1,6 +1,15 @@
 <?xml version="1.0"?>
     <project name="Automated CloudFormation Project" default="jar">
 
+    <path id="aws.path">
+        <fileset dir="src/aws-java-sdk.1.11.119/lib">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="src/aws-java-sdk.1.11.119/third-party/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
     <target name="cleans3">
         <delete dir="outputs"/>
     </target>
@@ -11,7 +20,8 @@
 
     <target name="compile" depends="clean">
         <mkdir dir="build/classes"/>
-        <javac includeantruntime="false" srcdir="src/cloudnexa/cf/maker" destdir="build/classes"/>
+        <javac includeantruntime="false" srcdir="src/cloudnexa/cf/maker" destdir="build/classes"
+            classpathref="aws.path"/>
     </target>
 
     <target name="jar" depends="clean,compile">
