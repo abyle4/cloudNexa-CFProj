@@ -407,7 +407,7 @@ public class Finder {
             for (String s : fileList) {
                 uploadFileName = s;
                 File file = new File(uploadFileName);
-                s3client.putObject(new PutObjectRequest(buckeName,keyName,file));
+                s3client.putObject(new PutObjectRequest(bucketName,keyName,file));
             }
         }
         catch (AmazonServiceException ase) {
