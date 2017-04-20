@@ -15,9 +15,12 @@ import java.text.DateFormat;
 //import com.amazonaws.services.s3.AmazonS3;
 //import com.amazonaws.services.s3.AmazonS3Client;
 //import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3;
-import com.amazonaws.services.s3.transfer;
-import com.amazonaws.services.s3.model;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.s3.*;
+import com.amazonaws.services.s3.transfer.*;
+import com.amazonaws.services.s3.model.*;
 
 /** 
  * The Finder class holds the main function and parses lines from the CSV to send to
