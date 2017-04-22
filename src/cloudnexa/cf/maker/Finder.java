@@ -9,13 +9,8 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.text.DateFormat;
-//import com.amazonaws.AmazonClientException;
-//import com.amazonaws.AmazonServiceException;
-//import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-//import com.amazonaws.services.s3.AmazonS3;
-//import com.amazonaws.services.s3.AmazonS3Client;
-//import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.*;
@@ -82,7 +77,7 @@ public class Finder {
         if (!pathToOutput.endsWith("/")) pathToOutput = pathToOutput.concat("/");
         */
 
-        String pathToOutput = "/home/ec2-user/cloudNexa-CFProj/outputs/";
+        String pathToOutput = "./outputs/";
 
         //get customer name for alarm names as well as output file name
         System.out.println("Please enter the customer name: ");
@@ -149,6 +144,8 @@ public class Finder {
         for (String s : fileList) {
             cloudnexa.cf.maker.CFmaker.footerInsert(s);
         }
+
+        s3Uploader(fileList);
     }
 	
     public static ArrayList<ArrayList<String>> parseLine(String csvLine) {
@@ -316,12 +313,6 @@ public class Finder {
         }
         fileName += "-";
         fileName += temp;
-        fileName += "-";
-        for (char c : d.toString().toCharArray()) {
-            if (c == ' ') fileName += '-';
-        else if (c == ':') continue;
-            else fileName += c;
-        }
         fileName += ".cf";
 
         return fileName;
@@ -400,18 +391,26 @@ public class Finder {
 
     public static void s3Uploader(ArrayList<String> fileList) {
         String bucketName = "cnexa-cf-scripts";
-        String keyName = ""; //KEYNAME HERE
+        String keyName = "";
         String uploadFileName = "";
-        int count = 0;
 
         AmazonS3 s3client = new AmazonS3Client(new ProfileCredentialsProvider());
         try {
             System.out.println("Beginning S3 file upload...\n");
             for (String s : fileList) {
                 uploadFileName = s;
+                keyName = s.replace("./outputs/", "");
                 File file = new File(uploadFileName);
-                s3client.putObject(new PutObjectRequest(bucketName,keyName,file));
+                s3client.putObject(bucketName,keyName,file);
+                /*
+                 * ObjectListing ol = s3client.listObjects(bucketName);
+                List<S3ObjectSummary> objects = ol.getObjectSummaries();
+                for (S3ObjectSummary os: objects) {
+                        System.out.println("* " + os.getKey());
+                } */
+                System.out.println("https://s3.amazonaws.com/cnexa-cf-scripts/" + keyName);
             }
+            System.out.println("Finished S3 file upload");
         }
         catch (AmazonServiceException ase) {
             System.out.println("Caught an AmazonServiceException, which " +
@@ -424,7 +423,7 @@ public class Finder {
             System.out.println("Error Type:       " + ase.getErrorType());
             System.out.println("Request ID:       " + ase.getRequestId());
         }
-		catch (AmazonClientException ace) {
+	catch (AmazonClientException ace) {
             System.out.println("Caught an AmazonClientException, which " +
             		"means the client encountered " +
                     "an internal error while trying to " +

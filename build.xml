@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
     <project name="Automated CloudFormation Project" default="jar">
+        <mkdir dir="build/jar"/>
         <path id="aws.path">
             <fileset dir="src/aws-java-sdk-1.11.119/lib/">
                 <include name="*.jar"/>
@@ -7,19 +8,12 @@
             <fileset dir="src/aws-java-sdk-1.11.119/third-party/lib/">
                 <include name="*.jar"/>
             </fileset>
+            <pathelement path="build/classes/"/>
         </path>
-        
-        <path id="run.classpath">
-            <fileset dir="src/aws-java-sdk-1.11.119/lib/">
-                <include name="*.jar"/>
-            </fileset>
-            <fileset dir="src/aws-java-sdk-1.11.119/third-party/lib/">
-                <include name="*.jar"/>
-            </fileset>
-            <fileset dir="build/classes/">
-                <include name="*.class"/>
-            </fileset>
-        </path>
+
+        <manifestclasspath property="jar.classpath" jarfile="build/jar/CF-Creator.jar">
+            <classpath refid="aws.path" />
+        </manifestclasspath>
 
         <target name="cleans3">
             <delete dir="outputs"/>
@@ -36,10 +30,10 @@
         </target>
 
         <target name="jar" depends="clean,compile">
-            <mkdir dir="build/jar"/>
             <jar destfile="build/jar/CF-Creator.jar" basedir="build/classes">
                 <manifest>
                     <attribute name="Main-Class" value="cloudnexa.cf.maker.Finder"/>
+                    <attribute name="Class-Path" value="${jar.classpath}"/>
                 </manifest>
             </jar>
         </target>
