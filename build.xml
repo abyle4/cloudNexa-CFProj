@@ -8,6 +8,18 @@
                 <include name="*.jar"/>
             </fileset>
         </path>
+        
+        <path id="run.classpath">
+            <fileset dir="src/aws-java-sdk-1.11.119/lib/">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="src/aws-java-sdk-1.11.119/third-party/lib/">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="build/classes/">
+                <include name="*.class"/>
+            </fileset>
+        </path>
 
         <target name="cleans3">
             <delete dir="outputs"/>
@@ -28,8 +40,6 @@
             <jar destfile="build/jar/CF-Creator.jar" basedir="build/classes">
                 <manifest>
                     <attribute name="Main-Class" value="cloudnexa.cf.maker.Finder"/>
-                    <attribute name="Class-Path" 
-                        value="../../src/aws-java-sdk-1.11.119/lib/* ../../src/aws-java-sdk-1.11.119/third-party/lib/*"/>
                 </manifest>
             </jar>
         </target>
