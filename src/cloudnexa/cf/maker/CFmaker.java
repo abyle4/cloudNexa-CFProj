@@ -52,7 +52,7 @@ public class CFmaker {
             FileWriter  fw = null;
                 
             //open the header file to read and copy to the beginning of new CF templates
-            Scanner scanner = new Scanner (new File("/home/ec2-user/andrew/cf/maker/header"));
+            Scanner scanner = new Scanner (new File("src/cloudnexa/cf/maker/header"));
                 
             //Ensures that the header at the top of the output file is only inserted once
             //	(at the time of file creation)
