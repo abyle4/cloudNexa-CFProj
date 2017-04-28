@@ -39,13 +39,10 @@ public class Finder {
      */
     public static void main(String[] args) throws Exception {
 
-        //Scanner for command line input (to get account review CSV file path and company name)
         Scanner commandInput = new Scanner(System.in);
         System.out.println("Please enter the full path to the input CSV file (including the name): ");
         String csvFilePath = commandInput.nextLine();
 
-        //create file object using path input by user; if the file does not exist,
-        //ask the user to re-enter the path to file
         File csvFile = new File(csvFilePath);
         if (!csvFile.exists()){
             while (!csvFile.exists()){
@@ -55,7 +52,6 @@ public class Finder {
             }
         }
 
-        //open CSV for reading
         Scanner fileReader = new Scanner(csvFile);
 
         /*
@@ -79,31 +75,24 @@ public class Finder {
 
         String pathToOutput = "./outputs/";
 
-        //get customer name for alarm names as well as output file name
         System.out.println("Please enter the customer name: ");
         String custName = commandInput.nextLine();
 
-        //close the command line Scanner
         commandInput.close();
 
-        //fileList keeps track of the output files being created -- one CF
-        //template will be created per region per cloud account
         ArrayList<String> fileList = new ArrayList<String>();
 
-        //line holds a parsed line of the account review csv
         ArrayList<ArrayList<String>> line = new ArrayList<ArrayList<String>>();
 
         //first line read from the account review CSV is the header line; not to be processed by CFBuilder
         boolean headerLine = true;
 
         //default values for which column holds data
-        //[resource_type,resource_id,name,platform,cloud_account,region,mounted_filesystems,mount_points]
-        int[] columns = {0,1,2,3,4,5,6,7};
+        //[resource_type,resource_id,name,platform,cloud_account,region,mounted_filesystems,mount_points,instance_type]
+        int[] columns = {0,1,2,3,4,5,6,7,8};
 
-        //while there are lines to read from the CSV
         while (fileReader.hasNext()) {
 
-            //parse the line
             line = parseLine(fileReader.nextLine());
 
             //find correct columns if this is the header line
@@ -111,7 +100,6 @@ public class Finder {
                 columns = headerReader(line);
             }
 
-            //if it's not an empty line
             if (line.size() != 0) {
 
                 //if this is not the header line, check if a file has been
@@ -131,13 +119,11 @@ public class Finder {
                     }
                     cloudnexa.cf.maker.CFmaker.CFBuilder(line,fileName,custName,columns);
                 }
-                //after first line is processed, remaining lines are not the header line
                 headerLine = false;
             }
             System.out.println("\n");
         }
 
-        //close the input file after all of the lines have been processed
         fileReader.close();
 
         //insert the footer into every CF template file that's been created
@@ -165,10 +151,8 @@ public class Finder {
      * @since 2017-03-20
      */
     public static ArrayList<ArrayList<String>> parseLine(String csvLine,char separator,char quote) {
-        //result is the parsed line to be returned
         ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
 
-        //temp contains a value in the line, to be added to result
         ArrayList<String> temp = new ArrayList<String>();
 
         if (csvLine == null && csvLine.isEmpty()) {
@@ -183,7 +167,6 @@ public class Finder {
             separator = DEFAULT_SEPARATOR;
         }
 
-        //curVal contains the current value, to be added to temp
         StringBuffer curVal = new StringBuffer();
         boolean inQuotes = false;
         boolean startCollectChar = false;
@@ -192,7 +175,6 @@ public class Finder {
 
         char[] chars = csvLine.toCharArray();
 
-        //for each character in the line
         for (char ch : chars) {
 
             //I added this logic to be able to deal with an array of
@@ -223,10 +205,6 @@ public class Finder {
             else if (ch == quote) {
                 inQuotes = true;
 
-                /*if (chars[0] != '"' && quote == '\"') {
-                    curVal.append('"');
-                }*/
-
                 if (startCollectChar) {
                     curVal.append('"');
                 }
@@ -247,7 +225,6 @@ public class Finder {
 
             }
 
-            //ignore carriage returns
             else if (ch == '\r') {
                 continue;
             }
@@ -258,16 +235,12 @@ public class Finder {
                 break;
             }
 
-            //if it's not a special character, add to current value
             else {
                 curVal.append(ch);
             }
         }
 
-        //flush current value to temp
         temp.add(curVal.toString());
-
-        //flush temp to result
         result.add(temp);
 
         return result;
@@ -388,7 +361,13 @@ public class Finder {
 
         return output;
     }
-
+    /**
+     * The s3Uploader function takes an array of names of files to upload to S3
+     * and uploads the files.
+     * 
+     * @author Andrew Byle
+     * @since 2017-04-22
+     */
     public static void s3Uploader(ArrayList<String> fileList) {
         String bucketName = "cnexa-cf-scripts";
         String keyName = "";
@@ -402,12 +381,6 @@ public class Finder {
                 keyName = s.replace("./outputs/", "");
                 File file = new File(uploadFileName);
                 s3client.putObject(bucketName,keyName,file);
-                /*
-                 * ObjectListing ol = s3client.listObjects(bucketName);
-                List<S3ObjectSummary> objects = ol.getObjectSummaries();
-                for (S3ObjectSummary os: objects) {
-                        System.out.println("* " + os.getKey());
-                } */
                 System.out.println("https://s3.amazonaws.com/cnexa-cf-scripts/" + keyName);
             }
             System.out.println("Finished S3 file upload");

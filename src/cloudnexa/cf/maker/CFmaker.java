@@ -51,7 +51,6 @@ public class CFmaker {
             BufferedWriter bw = null;
             FileWriter  fw = null;
                 
-            //open the header file to read and copy to the beginning of new CF templates
             Scanner scanner = new Scanner (new File("src/cloudnexa/cf/maker/header"));
                 
             //Ensures that the header at the top of the output file is only inserted once
@@ -63,7 +62,6 @@ public class CFmaker {
             //output file
             File myfile = new File(fileName);
                 
-            //if the specified output file doesn't exist, create a new one and mark it for header insertion
             if(!myfile.exists()){
                 insertHead = true;
                 myfile.createNewFile();
@@ -134,8 +132,6 @@ public class CFmaker {
                 }
             }
                 
-            //write CF template to buffer, flush buffer to FileWriter and FileWriter to file
-            //then close buffer and filewriter
             bw.write(addme);
                 
             bw.flush();
@@ -163,7 +159,6 @@ public class CFmaker {
             FileWriter fw = null;
             File myfile = new File(fName);
 
-            //if the file does not exist, don't try to open for writing
             if (!myfile.exists()) {
                 return;
             }
@@ -258,7 +253,7 @@ public class CFmaker {
 	    else instanceID += c;
 	}
 		
-    //input.get(headers[2]).get(0) is the instance name
+        //input.get(headers[2]).get(0) is the instance name
 	switch (casenum){
 	    case 0: out += "\"" + instanceID + "EC2HealthStatusCheckAlarm\"";
                     System.out.println("Adding Status Check alarm for " + input.get(headers[2]).get(0));
@@ -496,7 +491,6 @@ public class CFmaker {
         }
         out += ", \"Statistic\" : \"Average\",";
         out += "\"Threshold\" : ";
-        //TO BE UPDATED TO TAKE INSTANCE SIZE INTO CONSIDERATION
         NumberFormat thresholdFormat = NumberFormat.getInstance();
         thresholdFormat.setGroupingUsed(false);
         switch(casenum){
