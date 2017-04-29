@@ -22,6 +22,12 @@
         <target name="clean">
             <delete dir="build"/>
         </target>
+        
+        <target name="cleancsv">
+            <delete>
+                <fileset dir="csv" includes="**/*.csv"/>
+            </delete>
+        </target>
 
         <target name="compile" depends="clean">
             <mkdir dir="build/classes"/>
