@@ -37,7 +37,11 @@ public class CFmaker {
         else{
             return;
         }
-            
+        
+        if(input.get(headers[2]).get(0) == null || "".equals(input.get(headers[2]).get(0))){
+            input.set(headers[2], input.get(headers[1]));
+        }
+
         //default assumption is Linux for system OS
         boolean isWindows = false;
         String sysOS = input.get(headers[3]).get(0);
