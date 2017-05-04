@@ -38,10 +38,6 @@ public class CFmaker {
             return;
         }
         
-        if(input.get(headers[2]).get(0) == null || "".equals(input.get(headers[2]).get(0))){
-            input.set(headers[2], input.get(headers[1]));
-        }
-
         //default assumption is Linux for system OS
         boolean isWindows = false;
         String sysOS = input.get(headers[3]).get(0);
@@ -256,27 +252,32 @@ public class CFmaker {
 	    if (c == '-') continue;
 	    else instanceID += c;
 	}
+
+        String resourceName = input.get(headers[2]).get(0);
+        if(resourceName == null || "".equals(resourceName)){
+            resourceName = input.get(headers[1]).get(0);
+        }
 		
         //input.get(headers[2]).get(0) is the instance name
 	switch (casenum){
 	    case 0: out += "\"" + instanceID + "EC2HealthStatusCheckAlarm\"";
-                    System.out.println("Adding Status Check alarm for " + input.get(headers[2]).get(0));
+                    System.out.println("Adding Status Check alarm for " + resourceName);
                     break;
             case 1: out += "\"" + instanceID + "EC2MEMAlarmHigh\"";
-                    System.out.println("Adding MemoryUtilization alarm for " + input.get(headers[2]).get(0));
+                    System.out.println("Adding MemoryUtilization alarm for " + resourceName);
                     break;
             case 2: if (isWindows) out += "\"" + instanceID + "EC2WinVOLAlarmHigh\"";
                     else out += "\"" + instanceID + "EC2LinuxVOLAlarmHigh\"";
-                    System.out.println("Adding VolumeUtilization alarm for " + input.get(headers[2]).get(0));
+                    System.out.println("Adding VolumeUtilization alarm for " + resourceName);
                     break;
             case 3: out += "\"" + instanceID + "EC2PageFileAlarmHigh\"";
-                    System.out.println("Adding Paging File Utilization alarm for " + input.get(headers[2]).get(0));
+                    System.out.println("Adding Paging File Utilization alarm for " + resourceName);
                     break;
             case 4: out += "\"" + instanceID + "EC2SwapAlarmHigh\"";
-                    System.out.println("Adding Swap Utilization alarm for " + input.get(headers[2]).get(0));
+                    System.out.println("Adding Swap Utilization alarm for " + resourceName);
                     break;
             case 5: out += "\"" + instanceID + "EC2CPUAlarmHigh\"";
-                    System.out.println("Adding High CPU alarm for " + input.get(headers[2]).get(0));
+                    System.out.println("Adding High CPU alarm for " + resourceName);
                     break;
             default: return out;
         }
@@ -298,7 +299,7 @@ public class CFmaker {
                     break;
             default: return out;
         }
-        out += " - " + input.get(headers[2]).get(0) + "\",";
+        out += " - " + resourceName + "\",";
         out += "\"MetricName\":\"";
         switch (casenum) {
             case 0: out += "StatusCheckFailed\"";
@@ -402,20 +403,25 @@ public class CFmaker {
             if (!Character.isLetterOrDigit(c)) continue;
             else resourceID += c;
         }
+
+        String resourceName = input.get(headers[2]).get(0);
+        if(resourceName == null || "".equals(resourceName)){
+            resourceName = input.get(headers[1]).get(0);
+        }
 		
         //input.get(headers[2]).get(0) is the resource name
         switch(casenum){
             case 0: out += "\"" + resourceID + "RDSHighCPUAlarm\"";
-                    System.out.println("Adding High CPU alarm for " + input.get(headers[2]).get(0));
+                    System.out.println("Adding High CPU alarm for " + resourceName);
                     break;
             case 1: out += "\"" + resourceID + "RDSHighDBConnectionsAlarm\"";
-                    System.out.println("Adding High DB connections alarm for " + input.get(headers[2]).get(0));
+                    System.out.println("Adding High DB connections alarm for " + resourceName);
                     break;
             case 2: out += "\"" + resourceID + "RDSLowMemoryAlarm\"";
-    	        System.out.println("Adding Low memory alarm for " + input.get(headers[2]).get(0));
+    	        System.out.println("Adding Low memory alarm for " + resourceName);
     	        break;
             case 3: out += "\"" + resourceID + "RDSLowStorageAlarm\"";
-    	        System.out.println("Adding Low storage alarm for " + input.get(headers[2]).get(0));
+    	        System.out.println("Adding Low storage alarm for " + resourceName);
     	        break;
             default: return out;
         }
@@ -434,7 +440,7 @@ public class CFmaker {
 	            break;
             default: return out;
         }
-        out += " - " + input.get(headers[2]).get(0) + "\",";
+        out += " - " + resourceName + "\",";
         out += "\"ComparisonOperator\" : \"";
 	    
         switch(casenum){
@@ -529,14 +535,19 @@ public class CFmaker {
                 if (!Character.isLetterOrDigit(c)) continue;
             else resourceID += c;
         }
+
+        String resourceName = input.get(headers[2]).get(0);
+        if(resourceName == null || "".equals(resourceName)){
+            resourceName = input.get(headers[1]).get(0);
+        }
             
         //input.get(headers[2]).get(0) is the resource name
         switch(casenum){
             case 0: out += "\"" + resourceID + "ELBHighUnhealthyHostsAlarm\"";
-                    System.out.println("Adding High Unhealthy Hosts alarm for " + input.get(headers[2]).get(0));
+                    System.out.println("Adding High Unhealthy Hosts alarm for " + resourceName);
                 break;
             case 1: out += "\"" + resourceID + "ELBNoHealthyHostsAlarm\"";
-                    System.out.println("Adding No Healthy Hosts alarm for " + input.get(headers[2]).get(0));
+                    System.out.println("Adding No Healthy Hosts alarm for " + resourceName);
                 break;
             default: return out;
         }
@@ -551,7 +562,7 @@ public class CFmaker {
                     break;
             default: return out;
         }
-        out += " - " + input.get(headers[2]).get(0) + "\",";
+        out += " - " + resourceName + "\",";
         out += "\"ComparisonOperator\" : \"";
             
         switch(casenum){
