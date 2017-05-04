@@ -299,7 +299,7 @@ public class CFmaker {
                     break;
             default: return out;
         }
-        out += " - " + resourceName + "\",";
+        out += " - " + input.get(headers[1]).get(0) + "\",";
         out += "\"MetricName\":\"";
         switch (casenum) {
             case 0: out += "StatusCheckFailed\"";
@@ -440,7 +440,7 @@ public class CFmaker {
 	            break;
             default: return out;
         }
-        out += " - " + resourceName + "\",";
+        out += " - " + input.get(headers[1]).get(0) + "\",";
         out += "\"ComparisonOperator\" : \"";
 	    
         switch(casenum){
@@ -562,7 +562,7 @@ public class CFmaker {
                     break;
             default: return out;
         }
-        out += " - " + resourceName + "\",";
+        out += " - " + input.get(headers[1]).get(0) + "\",";
         out += "\"ComparisonOperator\" : \"";
             
         switch(casenum){
