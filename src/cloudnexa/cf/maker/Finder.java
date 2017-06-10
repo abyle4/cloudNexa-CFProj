@@ -323,9 +323,9 @@ public class Finder {
                         break;
                 case 5: compare = "region";
                         break;
-        		case 6: compare = "mounted_filesystems";
+        		case 6: compare = "mounted_fs";
 		            	break;
-                case 7: compare = "mount_points";
+                case 7: compare = "mount_pt";
                         break;
                 case 8: compare = "instance_type";
                 default: break;
