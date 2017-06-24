@@ -245,7 +245,41 @@ public class Finder {
 
         return result;
     }
-        
+    
+    /**
+     * The invalidRegion method takes in a region name and checks it against a list of
+     * known valid region names. Returns true if the region name is invalid, false
+     * otherwise.
+     *
+     * @author Lucas Vitalos
+     * @since 2017-06-24
+     */
+    public static boolean invalidRegion(String region){
+        String[] valid_regions = {
+            "us-east-1",
+            "us-east-2",
+            "us-west-1",
+            "us-west-2",
+            "ca-central-1",
+            "ap-south-1",
+            "ap-northeast-2",
+            "ap-southeast-1",
+            "ap-southeast-2",
+            "ap-northeast-1",
+            "eu-central-1",
+            "eu-west-1",
+            "eu-west-2",
+            "sa-east-1"
+        };
+
+        for(String valregion : valid_regions){
+            if(region.compareTo(valregion) == 0){
+                return false;
+            }
+        }
+
+        return true;
+    }
     /**
      * The fileNamer method takes in a line from the CSV and the name of the company
      * and outputs the properly named file.
@@ -256,7 +290,11 @@ public class Finder {
     public static String fileNamer(ArrayList<ArrayList<String>> line,String compName,int headers[]) {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String d = df.format(new Date());
-        String region = line.get(headers[5]).get(0);
+        String region = line.get(headers[5]).get(0).toLowerCase();
+        if(invalidRegion(region)){
+            System.err.println("Invalid region name: " + region);
+            System.exit(1);
+        }
         String fileName = "";
         String temp = "";
         for (char c : d.toString().toCharArray()) {
