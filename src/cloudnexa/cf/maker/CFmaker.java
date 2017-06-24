@@ -375,6 +375,10 @@ public class CFmaker {
             else{
                 //input.get(headers[6]) is the list of mounted filesystems for linux instances
                 //input.get(headers[7]) is the corresponding list of mount points
+                //
+                if (input.get(headers[6]).size() != input.get(headers[7]).size()) {
+                    System.err.println("The number of mounted filesystems does not match the number of mount points for instance: " + input.get(headers[1]).get(0))
+                }
                 for (int i = 0; i < input.get(headers[6]).size(); i++){
                     out += "},{\"Name\": \"MountPath\",\"Value\": \"" + input.get(headers[7]).get(i) + "\"},{\"Name\": \"Filesystem\",\"Value\": \"" + input.get(headers[6]).get(i) + "\"";
                 }
