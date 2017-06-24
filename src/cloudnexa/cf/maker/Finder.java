@@ -133,7 +133,7 @@ public class Finder {
 
         s3Uploader(fileList);
     }
-	
+        
     public static ArrayList<ArrayList<String>> parseLine(String csvLine) {
         return parseLine(csvLine, DEFAULT_SEPARATOR, DEFAULT_QUOTE);
     }
@@ -229,7 +229,7 @@ public class Finder {
                 continue;
             }
             else if (ch == '\n') {
-				temp = new ArrayList<String>();
+                temp = new ArrayList<String>();
                 curVal = new StringBuffer();
                 startCollectChar = false;
                 break;
@@ -245,7 +245,7 @@ public class Finder {
 
         return result;
     }
-	
+        
     /**
      * The fileNamer method takes in a line from the CSV and the name of the company
      * and outputs the properly named file.
@@ -290,7 +290,7 @@ public class Finder {
 
         return fileName;
     }
-	
+        
     /**
      * The headerReader method takes in a (the first) line from the CSV
      * and outputs a list of integers that tell the program where to
@@ -323,8 +323,8 @@ public class Finder {
                         break;
                 case 5: compare = "region";
                         break;
-        		case 6: compare = "mounted_fs";
-		            	break;
+                case 6: compare = "mounted_fs";
+                        break;
                 case 7: compare = "mount_pt";
                         break;
                 case 8: compare = "instance_type";
@@ -347,7 +347,7 @@ public class Finder {
                 }
                 spotCount ++;
             }
-			//If the header cannot be found, the program will return an error.
+            //If the header cannot be found, the program will return an error.
             if (missingHeader) {
                 System.err.println("Column header not found! Please ensure CSV is properly formatted and try again...");
                 System.exit(1);
@@ -387,21 +387,21 @@ public class Finder {
         }
         catch (AmazonServiceException ase) {
             System.out.println("Caught an AmazonServiceException, which " +
-            		"means your request made it " +
-                    "to Amazon S3, but was rejected with an error response" +
-                    " for some reason.");
+                               "means your request made it " +
+                               "to Amazon S3, but was rejected with an error response" +
+                               " for some reason.");
             System.out.println("Error Message:    " + ase.getMessage());
             System.out.println("HTTP Status Code: " + ase.getStatusCode());
             System.out.println("AWS Error Code:   " + ase.getErrorCode());
             System.out.println("Error Type:       " + ase.getErrorType());
             System.out.println("Request ID:       " + ase.getRequestId());
         }
-	catch (AmazonClientException ace) {
+        catch (AmazonClientException ace) {
             System.out.println("Caught an AmazonClientException, which " +
-            		"means the client encountered " +
-                    "an internal error while trying to " +
-                    "communicate with S3, " +
-                    "such as not being able to access the network.");
+                               "means the client encountered " +
+                               "an internal error while trying to " +
+                               "communicate with S3, " +
+                               "such as not being able to access the network.");
             System.out.println("Error Message: " + ace.getMessage());
         }
     }
