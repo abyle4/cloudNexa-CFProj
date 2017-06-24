@@ -345,11 +345,12 @@ public class Finder {
                     missingHeader = false;
                     break;
                 }
-                spotCount ++;
+                spotCount++;
             }
             //If the header cannot be found, the program will return an error.
             if (missingHeader) {
                 System.err.println("Column header not found! Please ensure CSV is properly formatted and try again...");
+                System.err.println("Missing header: " + compare);
                 System.exit(1);
             }
 
